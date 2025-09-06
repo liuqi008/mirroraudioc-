@@ -44,7 +44,7 @@ int wmain(int argc, wchar_t** argv) {
         }
         if (msg.find(L"PING") != std::wstring::npos || msg.find(L"ping") != std::wstring::npos){
             logw(L"[ping] pong");
-            return std::wstring(LR"({"ok":true,"pong":1})");
+            return std::wstring(L"{\"ok\":true,\"pong\":1}");
         }
         engine.onControlMessage(msg);
         return std::wstring(LR"({"ok":true})");
