@@ -1,3 +1,4 @@
+#nullable enable
 
 using System;
 using System.ComponentModel;
@@ -204,13 +205,13 @@ public sealed class CoreHost : IDisposable
         public UIntPtr PeakProcessMemoryUsed;
         public UIntPtr PeakJobMemoryUsed;
     }
-    [DllImport("kernel32.dll", SetLastError = True)]
+    [DllImport("kernel32.dll", SetLastError = true)]
     static extern IntPtr CreateJobObject(IntPtr lpJobAttributes, string? name);
-    [DllImport("kernel32.dll", SetLastError = True)]
+    [DllImport("kernel32.dll", SetLastError = true)]
     static extern bool SetInformationJobObject(IntPtr hJob, int infoClass, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
-    [DllImport("kernel32.dll", SetLastError = True)]
+    [DllImport("kernel32.dll", SetLastError = true)]
     static extern bool AssignProcessToJobObject(IntPtr hJob, IntPtr hProcess);
-    [DllImport("kernel32.dll", SetLastError = True)]
+    [DllImport("kernel32.dll", SetLastError = true)]
     static extern bool CloseHandle(IntPtr hObject);
     #endregion
 }
