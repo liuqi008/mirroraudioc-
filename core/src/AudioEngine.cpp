@@ -137,7 +137,7 @@ void AudioEngine::renderLoop(){
         if (toWrite>0){
             hr = rc_->GetBuffer(toWrite, &pOut);
             if (SUCCEEDED(hr)){
-                memcpy(pOut, pData, toWrite * 4); // demo: assume 16-bit stereo
+                memcpy(pOut, pData, toWrite * 4); // demo copy (assumes 16-bit stereo)
                 rc_->ReleaseBuffer(toWrite, 0);
             }
         }

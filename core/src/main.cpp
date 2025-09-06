@@ -35,19 +35,24 @@ int wmain(int argc, wchar_t** argv) {
         return 1;
     }
 
+    static const wchar_t* kPipeName = L"\\.\pipe\MirrorAudioSettings";
     std::atomic<bool> running{ true };
-    NamedPipeServer server(LR"(\.\pipe\MirrorAudioSettings)", [&](const std::wstring& msg){
-        if (msg.find(L""log"") != std::wstring::npos){
+    NamedPipeServer server(std::wstring(kPipeName), [&](const std::wstring& msg){
+        // logging toggle
+        if (msg.find(L"\"log\"") != std::wstring::npos || msg.find(L""log"") != std::wstring::npos){
             if (msg.find(L"true") != std::wstring::npos) { log_enabled = true; logw(L"[log] enabled"); }
             else if (msg.find(L"false") != std::wstring::npos) { logw(L"[log] disabled"); log_enabled = false; }
-            return std::wstring(LR"({"ok":true,"log":)") + (log_enabled?L"true":L"false") + L"}";
+            std::wstring resp = L"{"ok":true,"log":"; resp += (log_enabled ? L"true" : L"false"); resp += L"}";
+            return resp;
         }
+        // heartbeat
         if (msg.find(L"PING") != std::wstring::npos || msg.find(L"ping") != std::wstring::npos){
             logw(L"[ping] pong");
-            return std::wstring(L"{\"ok\":true,\"pong\":1}");
+            return std::wstring(L"{"ok":true,"pong":1}");
         }
+        // other control
         engine.onControlMessage(msg);
-        return std::wstring(LR"({"ok":true})");
+        return std::wstring(L"{"ok":true}");
     });
 
     std::thread pipeThread([&]{ server.run(running); });

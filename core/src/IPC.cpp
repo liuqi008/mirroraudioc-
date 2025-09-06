@@ -25,8 +25,8 @@ void NamedPipeServer::run(std::atomic<bool>& running){
         }
 
         std::wstring resp;
-        try { resp = handler_? handler_(req) : LR"({"ok":true})"; }
-        catch(...) { resp = LR"({"ok":false})"; }
+        try { resp = handler_? handler_(req) : L"{"ok":true}"; }
+        catch(...) { resp = L"{"ok":false}"; }
 
         DWORD written=0;
         WriteFile(hPipe, resp.c_str(), (DWORD)((resp.size()+1)*sizeof(wchar_t)), &written, nullptr);
