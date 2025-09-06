@@ -10,7 +10,7 @@ namespace MirrorAudio.UI
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new SettingsForm());
+            Application.Run(new AppContext()); // Tray ApplicationContext
         }
     }
 }

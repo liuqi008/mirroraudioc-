@@ -35,7 +35,7 @@ int wmain(int argc, wchar_t** argv) {
         return 1;
     }
 
-    static const wchar_t* kPipeName = L"\\.\pipe\MirrorAudioSettings";
+    static const wchar_t* kPipeName = L"\\\\.\\pipe\\MirrorAudioSettings";
     std::atomic<bool> running{ true };
     NamedPipeServer server(std::wstring(kPipeName), [&](const std::wstring& msg){
         // logging toggle
