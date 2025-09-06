@@ -1,5 +1,5 @@
-#nullable enable
 
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,10 +21,10 @@ namespace MirrorAudio.UI
             _core.CoreCrashed +=   (_, ex) => ShowBalloon("内核异常：" + ex.Message);
 
             var menu = new ContextMenuStrip();
+
             var mStart = new ToolStripMenuItem("启动(&S)", null, async (_, __) => await StartCore());
             var mStop  = new ToolStripMenuItem("停止(&T)", null, async (_, __) => await _core.StopAsync());
             var mApply = new ToolStripMenuItem("应用参数(&A)", null, async (_, __) => {
-                // 这里可从配置文件读取参数再下发；先用默认值示例
                 await _core.SendJsonAsync(new {
                     cmd = "apply",
                     exclusive = true,
@@ -36,15 +36,28 @@ namespace MirrorAudio.UI
                     channels = 2
                 });
             });
-            var mLog   = new ToolStripMenuItem("启用日志(&L)", null, async (_, __) => {
+
+            // Declare mLog BEFORE adding to menu or using inside AddRange
+            var mLog = new ToolStripMenuItem("启用日志(&L)");
+            mLog.CheckOnClick = true;
+            mLog.Click += async (_, __) => {
                 _logEnabled = !_logEnabled;
                 mLog.Checked = _logEnabled;
                 await _core.EnableLogAsync(_logEnabled);
-            }) { CheckOnClick = true };
+            };
+
             var mSettings = new ToolStripMenuItem("设置(&O)…", null, (_, __) => ShowSettings());
             var mExit  = new ToolStripMenuItem("退出(&X)", null, async (_, __) => await CleanupAndExit());
 
-            menu.Items.AddRange(new ToolStripItem[] { mStart, mStop, mApply, new ToolStripSeparator(), mLog, new ToolStripSeparator(), mSettings, new ToolStripSeparator(), mExit });
+            menu.Items.Add(mStart);
+            menu.Items.Add(mStop);
+            menu.Items.Add(mApply);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(mLog);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(mSettings);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(mExit);
 
             _tray = new NotifyIcon {
                 Icon = System.Drawing.SystemIcons.Application,
@@ -55,7 +68,7 @@ namespace MirrorAudio.UI
             _tray.DoubleClick += (_, __) => ShowSettings();
         }
 
-        private async Task StartCore()
+        private async System.Threading.Tasks.Task StartCore()
         {
             await _core.StartAsync(false);
             if (_logEnabled) await _core.EnableLogAsync(true);
@@ -84,7 +97,7 @@ namespace MirrorAudio.UI
         private void ShowBalloon(string msg) =>
             _tray?.ShowBalloonTip(2000, "MirrorAudio", msg, ToolTipIcon.Info);
 
-        private async Task CleanupAndExit()
+        private async System.Threading.Tasks.Task CleanupAndExit()
         {
             try { await _core.StopAsync(); } catch { }
             _tray.Visible = false;
